@@ -2,53 +2,90 @@ import sys
 import requests
 import time
 import json
+import datetime
 from pymongo import MongoClient
 
 URL_PREFIX = 'https://erikberg.com/'
 APP_KEY = '98766e2d-0f0a-4257-84b1-3b70bf9894a5'
 HEADERS = {'Authorization':'Bearer ' + APP_KEY}
 
+DATE_FORMAT = '%Y%m%d'
+
 # DB init
 client = MongoClient('localhost', 27017)
 db = client['nbadb']
-players = db['players']
+games = db['games']
 
-#get a YYYYMMDD date format from the user. TODO - if no input recieved, need to exit gracefully
-date = sys.argv[1]
+def insert_doc(doc, event_id):
+    name = json.dumps(doc['display_name'])
+    doc['id'] = event_id + '_' + name # adding a unique identifer: a concat of the event_id and the player's name, for example: 20131029-orlando-magic-at-indiana-pacers_Paul George
+    print('Creating a record for ' + doc['id'])
+    games.insert(doc)
 
-def handle_box_score(bs):
+def process_day(date):
 
-  away = bs['away_stats']
-  home = bs['home_stats']
-
-  for h,a in zip(home, away):
-    print('inserting ' + json.dumps(h['display_name']) + ' to db')
-    print('inserting ' + json.dumps(a['display_name']) + ' to db')
-
-    players.insert(h)
-    players.insert(a)
-
-# step 1 - get all the events from the given date
-url = URL_PREFIX + 'events.json?date=' +date + '&sport=nba'
-print('sending request to: ' + url)
-r = requests.get(url, headers=HEADERS)
-d = r.json()
-
-# step 2 - for each event, get the box score and save it
-events = d['event']
-for e in events:
-
-  event_id = e['event_id'] #the unique id of the event
-  url = URL_PREFIX + 'nba/boxscore/' + event_id + '.json'
+  # step 1 - get all the events from the given date
+  url = URL_PREFIX + 'events.json?date=' +date + '&sport=nba'
   print('sending request to: ' + url)
+  req = requests.get(url, headers=HEADERS)
+  res = req.json()
 
-  r = requests.get(url, headers=HEADERS)
-  bs = json.loads(r.text, 'utf-8')
-  handle_box_score(bs)
+  # step 2 - for each event, get the box score and save it
+  events = res['event']
+  if len(events) == 0:
+    print('No games on that day... sleeping 10 seconds and moving to the next day')
 
-  print('sleeping for 10 seconds...')
-  time.sleep(10) # max 6 calls per minute allowed
+  time.sleep(10)
 
+  for e in events:
+    try:
+      event_id = e['event_id']
+      url = URL_PREFIX + 'nba/boxscore/' + event_id + '.json'
+      print('sending request to: ' + url)
 
+      req = requests.get(url, headers=HEADERS)
+      bs = json.loads(req.text, 'utf-8')
 
+      # step 3 - crop home/away stats and insert all the documents to the DB
+      away = bs['away_stats']
+      home = bs['home_stats']
+
+      for h,a in zip(home, away):
+        try:
+          insert_doc(h, event_id)
+          insert_doc(a, event_id)
+        except:
+          print("Error inserting record to DB")
+          continue
+    except:
+      print('Error getting boxscore details for event ' + str(e))
+      continue
+    finally:
+      print('sleeping for 10 seconds...')
+      time.sleep(10) # max 6 calls per minute allowed
+
+# get a year from the user in YYYY format. TODO - add error handling
+year = int(sys.argv[1])
+
+# from http://www.daniweb.com/software-development/python/threads/45713/loop-through-a-year
+
+# create date objects
+begin_year = datetime.date(year, 10, 1)
+end_year = datetime.date(year+1, 4, 30)
+one_day = datetime.timedelta(days=1)
+
+next_day = begin_year
+for day in range(0, 366):  # includes potential leap year
+    if next_day > end_year:
+        break
+    try:
+      day_str = next_day.strftime(DATE_FORMAT)
+      print('running nba.py ' + day_str)
+      process_day(day_str)
+    except:
+      print('Error processing day for ' + day_str)
+      continue
+    finally:
+      # increment date object by one day
+      next_day += one_day
 

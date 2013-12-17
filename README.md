@@ -1,7 +1,7 @@
 nbaDB
 =====
 
-for now, a simple python script for d/l nba data to a local mongoDB instance.
+for now, a simple python script for d/l nba boxscore data to a local mongoDB instance.
 all data is taken from Erik Berg's [xmlstats](https://erikberg.com/api)
 
 ## Installation
@@ -16,8 +16,8 @@ all data is taken from Erik Berg's [xmlstats](https://erikberg.com/api)
 ## Usage
 
 
-run `nba.py` with a specific date in `YYYYMMDD` format to insert data from all the games on that date. for example:
-`python nba.py 20131216` will retrieve all the games from 16-12-2013. For each game, and for each player, a document will be stored. for example: 
+run `nba.py` with a specific year in YYYY format to insert data from all the games during that year. for example:
+`python nba.py 2013` will retrieve all the games from the year 2013. For each game, and for each player, a document will be stored in the `games` collection that will hold the following details:
 
 ```
  {
@@ -51,10 +51,11 @@ run `nba.py` with a specific date in `YYYYMMDD` format to insert data from all t
             "free_throw_percentage_string": "50.0"
         }
 ```
+The document will also hold a unique id that is a concat of the event_id and the player's name. for example:
+`20131029-orlando-magic-at-indiana-pacers_Paul George`
 
 
-
-## Goal
+## Goals
 
 
 - Get Ofer to another NBA game
