@@ -7,7 +7,7 @@ from pymongo import MongoClient
 
 URL_PREFIX = 'https://erikberg.com/'
 APP_KEY = '98766e2d-0f0a-4257-84b1-3b70bf9894a5'
-HEADERS = {'Authorization':'Bearer ' + APP_KEY}
+HEADERS = {'Authorization':'Bearer ' + APP_KEY, 'User-Agent': 'nbaDB 1.0 (ofer.moshaioff@gmail.com)'}
 
 DATE_FORMAT = '%Y%m%d'
 
