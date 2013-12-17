@@ -24,6 +24,7 @@ Goal
 
 - Get Ofer to another NBA game
 - Hopefully Yoav too
+- Grantland, here we come!
 
 
 
