@@ -8,14 +8,16 @@ URL_PREFIX = 'https://erikberg.com/'
 APP_KEY = '98766e2d-0f0a-4257-84b1-3b70bf9894a5'
 HEADERS = {'Authorization':'Bearer ' + APP_KEY}
 
+# DB init
 client = MongoClient('localhost', 27017)
 db = client['nbadb']
 players = db['players']
 
-date = sys.argv[1] #get a YYYYMMDD date format from the user
+#get a YYYYMMDD date format from the user. TODO - if no date, need to exit gracefully
+date = sys.argv[1]
 
-def str_to_unicode(str):
-  return str.encode('utf-8').decode('utf-8')
+#def str_to_unicode(s):
+  #return str(s, 'utf-8')
 
 def parse_box_score(bs):
 
@@ -23,16 +25,18 @@ def parse_box_score(bs):
   home = bs['home_stats']
 
   for h,a in zip(home, away):
-    print('inserting ' + str_to_unicode(h['display_name']) + ' to db')
-    print('inserting ' + str_to_unicode(a['display_name']) + ' to db')
+    print('inserting ' + json.dumps(h['display_name']) + ' to db')
+    print('inserting ' + json.dumps(a['display_name']) + ' to db')
     players.insert(h)
     players.insert(a)
 
+# step 1 - get all the events from the given date
 url = URL_PREFIX + 'events.json?date=' +date + '&sport=nba'
 print('sending request to: ' + url)
 r = requests.get(url, headers=HEADERS)
 d = r.json()
 
+# step 2 - for each event, get the box score and save it
 events = d['event']
 for e in events:
 
@@ -41,9 +45,12 @@ for e in events:
   print('sending request to: ' + url)
 
   r = requests.get(url, headers=HEADERS)
-  bs = json.loads(str_to_unicode(r.text))
+  bs = json.loads(r.text, 'utf-8')
   parse_box_score(bs)
+
+  print('sleeping for 10 seconds...')
   time.sleep(10) # max 6 calls per minute allowed
+
 
 
 
