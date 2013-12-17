@@ -13,13 +13,10 @@ client = MongoClient('localhost', 27017)
 db = client['nbadb']
 players = db['players']
 
-#get a YYYYMMDD date format from the user. TODO - if no date, need to exit gracefully
+#get a YYYYMMDD date format from the user. TODO - if no input recieved, need to exit gracefully
 date = sys.argv[1]
 
-#def str_to_unicode(s):
-  #return str(s, 'utf-8')
-
-def parse_box_score(bs):
+def handle_box_score(bs):
 
   away = bs['away_stats']
   home = bs['home_stats']
@@ -27,6 +24,7 @@ def parse_box_score(bs):
   for h,a in zip(home, away):
     print('inserting ' + json.dumps(h['display_name']) + ' to db')
     print('inserting ' + json.dumps(a['display_name']) + ' to db')
+
     players.insert(h)
     players.insert(a)
 
@@ -46,7 +44,7 @@ for e in events:
 
   r = requests.get(url, headers=HEADERS)
   bs = json.loads(r.text, 'utf-8')
-  parse_box_score(bs)
+  handle_box_score(bs)
 
   print('sleeping for 10 seconds...')
   time.sleep(10) # max 6 calls per minute allowed
