@@ -10,11 +10,16 @@ APP_KEY = '98766e2d-0f0a-4257-84b1-3b70bf9894a5'
 HEADERS = {'Authorization':'Bearer ' + APP_KEY, 'User-Agent': 'nbaDB 1.0 (ofer.moshaioff@gmail.com)'}
 
 DATE_FORMAT = '%Y%m%d'
+MOCK_DB = False
 
 # DB init
-client = MongoClient('localhost', 27017)
-db = client['nbadb']
-games = db['games']
+if MOCK_DB:
+	import mockdb
+	games = mockdb.MockDb()
+else:
+	client = MongoClient('localhost', 27017)
+	db = client['nbadb']
+	games = db['games']
 
 def insert_doc(doc, event_id):
     name = json.dumps(doc['display_name'])
@@ -50,12 +55,12 @@ def process_day(date):
 			home = bs['home_stats']
 
 		  	for h,a in zip(home, away):
-		    	try:
-			      	insert_doc(h, event_id)
-			      	insert_doc(a, event_id)
-		    	except Exception as err:
-		      		print("Error inserting record to DB:", str(err))
-		      		continue
+				try:
+					insert_doc(h, event_id)
+					insert_doc(a, event_id)
+				except Exception as err:
+						print("Error inserting record to DB:", str(err))
+						continue
 		except:
 		  	print('Error getting boxscore details for event', str(e))
 		  	continue
@@ -91,3 +96,8 @@ for day in range(0, 366):  # includes potential leap year
       	# increment date object by one day
       	next_day += one_day
 
+if MOCK_DB:
+	import cPickle as pickle
+	with open("games.pickle", "wb") as fout:
+		pickle.dump(games.data, fout)
+	print("Mock DB written to file")
