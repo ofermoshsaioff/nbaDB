@@ -23,46 +23,45 @@ def insert_doc(doc, event_id):
     games.insert(doc)
 
 def process_day(date):
+	# step 1 - get all the events from the given date
+	url = URL_PREFIX + 'events.json?date=' +date + '&sport=nba'
+	print('sending request to: ' + url)
+	req = requests.get(url, headers=HEADERS)
+	res = req.json()
 
-  # step 1 - get all the events from the given date
-  url = URL_PREFIX + 'events.json?date=' +date + '&sport=nba'
-  print('sending request to: ' + url)
-  req = requests.get(url, headers=HEADERS)
-  res = req.json()
+	# step 2 - for each event, get the box score and save it
+	events = res['event']
+	if len(events) == 0:
+		print('No games on that day... sleeping 10 seconds and moving to the next day')
 
-  # step 2 - for each event, get the box score and save it
-  events = res['event']
-  if len(events) == 0:
-    print('No games on that day... sleeping 10 seconds and moving to the next day')
+	time.sleep(10)
 
-  time.sleep(10)
+	for e in events:
+	try:
+		event_id = e['event_id']
+		url = URL_PREFIX + 'nba/boxscore/' + event_id + '.json'
+		print('sending request to: ' + url)
 
-  for e in events:
-    try:
-      event_id = e['event_id']
-      url = URL_PREFIX + 'nba/boxscore/' + event_id + '.json'
-      print('sending request to: ' + url)
+		req = requests.get(url, headers=HEADERS)
+		bs = json.loads(req.text, 'utf-8')
 
-      req = requests.get(url, headers=HEADERS)
-      bs = json.loads(req.text, 'utf-8')
+		# step 3 - crop home/away stats and insert all the documents to the DB
+		away = bs['away_stats']
+		home = bs['home_stats']
 
-      # step 3 - crop home/away stats and insert all the documents to the DB
-      away = bs['away_stats']
-      home = bs['home_stats']
-
-      for h,a in zip(home, away):
-        try:
-          insert_doc(h, event_id)
-          insert_doc(a, event_id)
-        except:
-          print("Error inserting record to DB")
-          continue
-    except:
-      print('Error getting boxscore details for event ' + str(e))
-      continue
-    finally:
-      print('sleeping for 10 seconds...')
-      time.sleep(10) # max 6 calls per minute allowed
+	  	for h,a in zip(home, away):
+	    	try:
+		      	insert_doc(h, event_id)
+		      	insert_doc(a, event_id)
+	    	except:
+	      		print("Error inserting record to DB")
+	      		continue
+	except:
+	  	print('Error getting boxscore details for event ' + str(e))
+	  	continue
+	finally:
+	  	print('sleeping for 10 seconds...')
+	  	time.sleep(10) # max 6 calls per minute allowed
 
 # get a year from the user in YYYY format. TODO - add error handling
 year = int(sys.argv[1])
@@ -79,13 +78,13 @@ for day in range(0, 366):  # includes potential leap year
     if next_day > end_year:
         break
     try:
-      day_str = next_day.strftime(DATE_FORMAT)
-      print('running nba.py ' + day_str)
-      process_day(day_str)
+      	day_str = next_day.strftime(DATE_FORMAT)
+      	print('running nba.py ' + day_str)
+      	process_day(day_str)
     except:
-      print('Error processing day for ' + day_str)
-      continue
+      	print('Error processing day for ' + day_str)
+      	continue
     finally:
-      # increment date object by one day
-      next_day += one_day
+      	# increment date object by one day
+      	next_day += one_day
 
