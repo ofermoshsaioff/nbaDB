@@ -81,6 +81,9 @@ for day in range(0, 366):  # includes potential leap year
       	day_str = next_day.strftime(DATE_FORMAT)
       	print('running nba.py ' + day_str)
       	process_day(day_str)
+    except KeyboardInterrupt:
+    	print('User interrupt')
+    	break
     except:
       	print('Error processing day for ' + day_str)
       	continue
