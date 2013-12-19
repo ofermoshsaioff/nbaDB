@@ -51,8 +51,13 @@ run `nba.py` with a specific year in YYYY format to insert data from all the gam
             "free_throw_percentage_string": "50.0"
         }
 ```
-The document will also hold a unique id that is a concat of the event_id and the player's name. for example:
-`20131029-orlando-magic-at-indiana-pacers_Paul George`.
+The document will also hold several "general parameters" for the specific boxscore:
+- event_id (for exmaple: `20131029-orlando-magic-at-indiana-pacers`)
+- type (regular/playoff)
+- date 
+- season (in YYYY-YYYY format, for example: `2012-2013')
+- home_team (`washington-wizards`)
+- away_team
 
 To get a local copy of a collection from the DB, run `mongo2csv.py`. It loads the configuration from `cfg.py`, reads a collection and makes a table from it, then writes that table to CSV file with the same name as the collection. This can then be read in `R` or with `pandas` to do some statistics locally.
 

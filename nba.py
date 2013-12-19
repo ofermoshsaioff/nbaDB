@@ -21,14 +21,12 @@ def get_season(datetime_str):
 	season = ''
 	date_str = datetime_str[:10]
 	date = datetime.datetime.strptime(date_str, '%Y-%m-%d')
-	print(date)
 	year = date.year
 	month = date.month
 	if 8 <= month <= 12:
 		season = str(year) + '-' + str(year+1)
 	else:
 		season = str(year-1) + '-' + str(year)
-	print(season)
 	return season
 
 def insert_doc(doc, general_stats):
@@ -92,7 +90,7 @@ year = int(sys.argv[1])
 # from http://www.daniweb.com/software-development/python/threads/45713/loop-through-a-year
 
 # create date objects
-begin_year = datetime.date(year, 10, 1)
+begin_year = datetime.date(year, 12, 31)
 end_year = datetime.date(year + 1, 6, 30)
 one_day = datetime.timedelta(days=1)
 
