@@ -17,10 +17,14 @@ else:
 	db = client[DATABASE]
 	collection = db[COLLECTION]
 
-def get_season(datetime_str):
-	season = ''
+def get_date(datetime_str):
 	date_str = datetime_str[:10]
 	date = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+	print(str(date))
+	return date
+
+def get_season(datetime_str):
+	date = get_date(datetime_str)
 	year = date.year
 	month = date.month
 	if 8 <= month <= 12:
@@ -61,8 +65,8 @@ def process_day(date):
 			general_stats = {}
 			general_stats['event_id'] = event_id
 			general_stats['type'] = bs['event_information']['season_type']
-			general_stats['date'] = bs['event_information']['start_date_time'] #TODO - change to date object
-			general_stats['season'] = get_season(general_stats['date'])
+			general_stats['date'] = get_date(bs['event_information']['start_date_time'])
+			general_stats['season'] = get_season(bs['event_information']['start_date_time'])
 			general_stats['home_team'] = bs['home_team']['team_id']
 			general_stats['away_team'] = bs['away_team']['team_id']
 
@@ -90,7 +94,7 @@ year = int(sys.argv[1])
 # from http://www.daniweb.com/software-development/python/threads/45713/loop-through-a-year
 
 # create date objects
-begin_year = datetime.date(year, 12, 31)
+begin_year = datetime.date(year, 10, 15)
 end_year = datetime.date(year + 1, 6, 30)
 one_day = datetime.timedelta(days=1)
 
