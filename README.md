@@ -52,7 +52,10 @@ run `nba.py` with a specific year in YYYY format to insert data from all the gam
         }
 ```
 The document will also hold a unique id that is a concat of the event_id and the player's name. for example:
-`20131029-orlando-magic-at-indiana-pacers_Paul George`
+`20131029-orlando-magic-at-indiana-pacers_Paul George`.
+
+To get a local copy of a collection from the DB, run `mongo2csv.py`. It loads the configuration from `cfg.py`, reads a collection and makes a table from it, then writes that table to CSV file with the same name as the collection. This can then be read in `R` or with `pandas` to do some statistics locally.
+
 
 
 ## Goals
