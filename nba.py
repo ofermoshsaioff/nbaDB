@@ -25,7 +25,7 @@ def insert_doc(doc, event_id):
 
 def process_day(date):
 	# step 1 - get all the events from the given date
-	url = URL_PREFIX + 'events.json?date=' + date + '&sport=nba'
+	url = XML_STATS_URL + 'events.json?date=' + date + '&sport=nba'
 	print('Sending request to', url)
 	req = requests.get(url, headers=HEADERS)
 	res = req.json()
@@ -40,7 +40,7 @@ def process_day(date):
 	for e in events:
 		try:
 			event_id = e['event_id']
-			url = URL_PREFIX + 'nba/boxscore/' + event_id + '.json'
+			url = XML_STATS_URL + 'nba/boxscore/' + event_id + '.json'
 			print('Sending request to', url)
 
 			req = requests.get(url, headers=HEADERS)
