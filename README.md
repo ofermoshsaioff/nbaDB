@@ -10,7 +10,7 @@ all data is taken from Erik Berg's [xmlstats](https://erikberg.com/api)
 ### all you need is:
 
 - Love
-- Python 3.3
+- Python 2.7
 - MongoDB (a running instance, to install mongo as a service, click [here](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/#mongodb-as-a-windows-service))
 
 ## Usage
