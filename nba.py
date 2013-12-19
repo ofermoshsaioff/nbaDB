@@ -15,12 +15,12 @@ if MOCK_DB:
 else:
 	client = MongoClient(MONGO_URL)
 	db = client[DATABASE]
-	games = db[COLLECTION]
+	collection = db[COLLECTION]
 
 def insert_doc(doc, general_stats):
 	doc.update(general_stats)
 	print('Creating a record for %s for game %s' % (doc['display_name'], doc['event_id']))
-	games.insert(doc)
+	collection.insert(doc)
 
 def process_day(date):
 	# step 1 - get all the events from the given date
