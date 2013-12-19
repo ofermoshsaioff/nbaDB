@@ -17,6 +17,20 @@ else:
 	db = client[DATABASE]
 	collection = db[COLLECTION]
 
+def get_season(datetime_str):
+	season = ''
+	date_str = datetime_str[:10]
+	date = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+	print(date)
+	year = date.year
+	month = date.month
+	if 8 <= month <= 12:
+		season = str(year) + '-' + str(year+1)
+	else:
+		season = str(year-1) + '-' + str(year)
+	print(season)
+	return season
+
 def insert_doc(doc, general_stats):
 	doc.update(general_stats)
 	print('Creating a record for %s for game %s' % (doc['display_name'], doc['event_id']))
@@ -49,7 +63,8 @@ def process_day(date):
 			general_stats = {}
 			general_stats['event_id'] = event_id
 			general_stats['type'] = bs['event_information']['season_type']
-			general_stats['date'] = bs['event_information']['start_date_time']
+			general_stats['date'] = bs['event_information']['start_date_time'] #TODO - change to date object
+			general_stats['season'] = get_season(general_stats['date'])
 			general_stats['home_team'] = bs['home_team']['team_id']
 			general_stats['away_team'] = bs['away_team']['team_id']
 
@@ -64,8 +79,8 @@ def process_day(date):
 				except Exception as err:
 					print("Error inserting record to DB:", str(err))
 					continue
-		except:
-			print('Error getting boxscore details for event', str(e))
+		except Exception as error:
+			print('Error getting boxscore details', str(error))
 			continue
 		finally:
 			print('Sleeping for 10 seconds...')
@@ -78,7 +93,7 @@ year = int(sys.argv[1])
 
 # create date objects
 begin_year = datetime.date(year, 10, 1)
-end_year = datetime.date(year + 1, 4, 30)
+end_year = datetime.date(year + 1, 6, 30)
 one_day = datetime.timedelta(days=1)
 
 next_day = begin_year
