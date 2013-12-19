@@ -4,22 +4,18 @@ import time
 import json
 import datetime
 from pymongo import MongoClient
+from cfg import *
 
-URL_PREFIX = 'https://erikberg.com/'
-APP_KEY = '98766e2d-0f0a-4257-84b1-3b70bf9894a5'
-HEADERS = {'Authorization':'Bearer ' + APP_KEY, 'User-Agent': 'nbaDB 1.0 (ofer.moshaioff@gmail.com)'}
-
-DATE_FORMAT = '%Y%m%d'
-MOCK_DB = False
+HEADERS = {'Authorization':'Bearer ' + APP_KEY, 'User-Agent': USER_AGENT}
 
 # DB init
 if MOCK_DB:
 	import mockdb
 	games = mockdb.MockDb()
 else:
-	client = MongoClient('localhost', 27017)
-	db = client['nbadb']
-	games = db['games']
+	client = MongoClient(MONGO_URL)
+	db = client[DATABASE]
+	games = db[COLLECTION]
 
 def insert_doc(doc, event_id):
     name = json.dumps(doc['display_name'])
@@ -98,6 +94,7 @@ for day in range(0, 366):  # includes potential leap year
 
 if MOCK_DB:
 	import cPickle as pickle
-	with open("games.pickle", "wb") as fout:
+	fname = COLLECTION + ".pickle"
+	with open(fname, "wb") as fout:
 		pickle.dump(games.data, fout)
-	print("Mock DB written to file")
+	print("Mock DB written to file", fname)
