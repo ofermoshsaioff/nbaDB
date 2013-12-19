@@ -17,7 +17,7 @@ all data is taken from Erik Berg's [xmlstats](https://erikberg.com/api)
 
 
 run `nba.py` with a specific year in YYYY format to insert data from all the games during that year. for example:
-`python nba.py 2013` will retrieve all the games from the year 2013. For each game, and for each player, a document will be stored in the `games` collection that will hold the following details:
+`python nba.py 2013` will retrieve all the games from the year 2013. For each game, and for each player, a document will be stored in the `boxscores` collection that will hold the following details:
 
 ```
  {
@@ -51,8 +51,43 @@ run `nba.py` with a specific year in YYYY format to insert data from all the gam
             "free_throw_percentage_string": "50.0"
         }
 ```
-The document will also hold a unique id that is a concat of the event_id and the player's name. for example:
-`20131029-orlando-magic-at-indiana-pacers_Paul George`.
+another document, representing the team's totals (home & away) will also be stored in the `teams` collection. An example of such document:
+```
+{
+        "minutes": 239,
+        "points": 88,
+        "assists": 18,
+        "turnovers": 10,
+        "steals": 12,
+        "blocks": 8,
+        "rebounds": 42,
+        "field_goals_attempted": 91,
+        "field_goals_made": 33,
+        "three_point_field_goals_attempted": 17,
+        "three_point_field_goals_made": 6,
+        "free_throws_attempted": 19,
+        "free_throws_made": 16,
+        "defensive_rebounds": 27,
+        "offensive_rebounds": 15,
+        "personal_fouls": 18,
+        "field_goal_percentage": 0.363,
+        "three_point_percentage": 0.353,
+        "free_throw_percentage": 0.842,
+        "field_goal_percentage_string": "36.3",
+        "three_point_field_goal_percentage_string": "35.3",
+        "free_throw_percentage_string": "84.2"
+    }
+```
+
+Each document (both boxscore and team) will also hold several "general parameters" for the specific event:
+- event_id (for exmaple: `20131029-orlando-magic-at-indiana-pacers`)
+- type (regular/playoff)
+- date 
+- season (in YYYY-YYYY format, for example: `2012-2013')
+- home_team (`washington-wizards`)
+- away_team
+- each team stat document will also hold `team_name` parameter to signify the team's name
+
 
 To get a local copy of a collection from the DB, run `mongo2csv.py`. It loads the configuration from `cfg.py`, reads a collection and makes a table from it, then writes that table to CSV file with the same name as the collection. This can then be read in `R` or with `pandas` to do some statistics locally.
 
