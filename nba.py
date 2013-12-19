@@ -18,8 +18,7 @@ else:
 	games = db[COLLECTION]
 
 def insert_doc(doc, general_stats):
-	for k in general_stats:
-		doc[k] = general_stats[k]
+	doc.update(general_stats)
 	print('Creating a record for %s for game %s' % (doc['display_name'], doc['event_id']))
 	games.insert(doc)
 
