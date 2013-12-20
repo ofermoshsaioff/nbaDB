@@ -66,6 +66,9 @@ def process_day(date):
 	for e in events:
 		try:
 			event_id = e['event_id']
+			if e['event_status'] != 'completed' or (e['season_type'] != 'regular' and e['season_type'] != 'post'):
+				print 'Game %s is either not played yet, or not a regular or playoff game, skipping it...' % event_id
+				continue
 			url = XML_STATS_URL + 'nba/boxscore/' + event_id + '.json'
 			print 'Sending request to %s' % url
 
@@ -111,7 +114,7 @@ year = int(sys.argv[1])
 # from http://www.daniweb.com/software-development/python/threads/45713/loop-through-a-year
 
 # create date objects
-begin_year = datetime.date(year, 10, 31)
+begin_year = datetime.date(year, 10, 15)
 end_year = datetime.date(year + 1, 6, 30)
 one_day = datetime.timedelta(days=1)
 
