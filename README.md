@@ -11,10 +11,12 @@ all data is taken from Erik Berg's [xmlstats](https://erikberg.com/api)
 
 - Love
 - Python 2.7
+- iPython (and a bunch of other python libraries, all available [here](http://www.lfd.uci.edu/~gohlke/pythonlibs/) if you're running Windows)
 - MongoDB (a running instance, to install mongo as a service, click [here](http://docs.mongodb.org/manual/tutorial/install-mongodb-on-windows/#mongodb-as-a-windows-service))
 
 ## Usage
 
+### nba.py
 
 run `nba.py` with a specific year in YYYY format to insert data from all the games during that year. for example:
 `python nba.py 2013` will retrieve all the games from the year 2013. For each game, and for each player, a document will be stored in the `boxscores` collection that will hold the following details:
@@ -88,10 +90,13 @@ Each document (both boxscore and team) will also hold several "general parameter
 - away_team
 - each team stat document will also hold `team_name` parameter to signify the team's name
 
+### mongo2csv.py
 
 To get a local copy of a collection from the DB, run `mongo2csv.py`. It loads the configuration from `cfg.py`, reads a collection and makes a table from it, then writes that table to CSV file with the same name as the collection. This can then be read in `R` or with `pandas` to do some statistics locally.
 
+### analyzer.py
 
+This little script gets a collection from mongo that has season (or playoffs) averages for key metrics (points per game, steals, assists, rebounds etc.) per player and uses the [PCA](http://en.wikipedia.org/wiki/Principal_component_analysis) reduction to create a visual map of the players. This is very perliminary, but using this method we hope to learn more about a player's career trajectory by analyzing his proximity to other players.
 
 ## Goals
 
